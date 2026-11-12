@@ -72,6 +72,7 @@ export async function buildServer() {
 
   fastify.get('/tv/:id', async (req, reply) => {
     const { id } = req.params;
+    console.log(`[HTTP TV-ACCESS] IP: ${req.ip} -> /tv/${id} | User-Agent: ${req.headers['user-agent'] || 'unknown'}`);
     if (id.includes('.')) {
       return reply.sendFile(`tv/${id}`);
     }

@@ -196,4 +196,16 @@ export async function registerApiRoutes(fastify) {
     reply.hijack();
     registerClient(id, request, reply);
   });
+
+  // Telemetry and diagnostic logs from TV screens
+  fastify.post('/api/tv-log', async (request, reply) => {
+    const body = request.body || {};
+    const ip = request.ip;
+    const ua = body.ua || request.headers['user-agent'] || 'unknown';
+    const screen = body.screen || 'unknown';
+    const level = body.level || 'info';
+    const message = body.message || body.error || '';
+    console.log(`[TV-TELEMETRY] [${level.toUpperCase()}] IP: ${ip} | Res: ${screen} | Msg: ${message} | UA: ${ua}`);
+    return { received: true };
+  });
 }

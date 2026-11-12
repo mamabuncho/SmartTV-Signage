@@ -2,12 +2,13 @@
  * Smart TV Multi-Channel LAN Digital Signage System
  * TV Player Display Engine (Optimized for 24/7 Stability & Hardware Canvas Rendering)
  * Supports: Real-Time LAN Sync, Live Canvas Double-Buffer, Freeze Lock, Multi-Language (TH/EN/JA)
+ * Compatible with: Legacy Smart TVs (Samsung Tizen 2.3+, LG webOS 2.0+, Android TV, Safari, Chrome)
  * 
  * @author mamabuncho <mamabuncho@gmail.com>
  * @copyright 2026 mamabuncho. All rights reserved.
  */
 
-const tvTranslations = {
+var tvTranslations = {
   th: {
     channelPrefix: 'Smart TV ช่อง ',
     connected: '● เชื่อมต่อเซิร์ฟเวอร์แล้ว (ออนไลน์)',
@@ -46,114 +47,176 @@ const tvTranslations = {
   }
 };
 
+// Robust Query Parameter Extractor (Compatible back to Chrome 30 / Tizen 2.3)
+function getQueryParam(name) {
+  if (typeof window === 'undefined' || !window.location) return null;
+  if (typeof URLSearchParams !== 'undefined') {
+    try {
+      var sp = new URLSearchParams(window.location.search);
+      var val = sp.get(name);
+      if (val !== null) return val;
+    } catch (e) {}
+  }
+  var regex = new RegExp('[?&]' + name + '=([^&#]*)', 'i');
+  var match = regex.exec(window.location.search || '');
+  return match ? decodeURIComponent(match[1].replace(/\+/g, ' ')) : null;
+}
+
 function getTvLang() {
-  const queryParam = new URLSearchParams(window.location.search).get('lang');
+  var queryParam = getQueryParam('lang');
   if (queryParam && tvTranslations[queryParam]) return queryParam;
   try {
-    const stored = localStorage.getItem('smarttv_lang');
+    var stored = localStorage.getItem('smarttv_lang');
     if (stored && tvTranslations[stored]) return stored;
-  } catch {}
+  } catch (e) {}
   return 'th';
 }
 
 function tvT(key) {
-  const lang = getTvLang();
+  var lang = getTvLang();
   return (tvTranslations[lang] && tvTranslations[lang][key]) || tvTranslations.th[key] || '';
 }
 
 function getTargetChannelId() {
-  const queryParam = new URLSearchParams(window.location.search).get('channel');
+  var queryParam = getQueryParam('channel');
   if (queryParam && /^\d+$/.test(queryParam)) {
     return queryParam;
   }
-  const match = window.location.pathname.match(/\/tv\/(\d+)/);
+  var match = (window.location.pathname || '').match(/\/tv\/(\d+)/);
   if (match) {
     return match[1];
   }
   return '1';
 }
 
-const channelId = getTargetChannelId();
-const STORAGE_KEY = `signage_manifest_ch_${channelId}`;
-const SESSION_START_TIME = Date.now();
-const MAX_SESSION_DURATION_MS = 24 * 60 * 60 * 1000; // 24-hour maintenance soft reload
-
-let playlist = [];
-let currentIndex = -1;
-let activeSlot = 'A'; // 'A' or 'B'
-let timerId = null;
-let eventSource = null;
-let sseRetryDelay = 3000;
-let isPlaying = false;
-let pendingNewPlaylist = null;
-let wakeLockSentinel = null;
-let isFrozen = false;
-let isLiveMode = false;
-let currentChannelName = `${tvT('channelPrefix')}${channelId}`;
-
-// DOM Elements
-const slotA = document.getElementById('slotA');
-const slotB = document.getElementById('slotB');
-const imgA = document.getElementById('imgA');
-const imgB = document.getElementById('imgB');
-const vidA = document.getElementById('vidA');
-const vidB = document.getElementById('vidB');
-const standbyScreen = document.getElementById('standby-screen');
-const standbyTitle = document.getElementById('standby-title');
-const standbyBadge = document.getElementById('standby-badge');
-const fsBtn = document.getElementById('fs-btn');
-const netWarning = document.getElementById('net-warning');
-const antiSleepVideo = document.getElementById('anti-sleep-video');
-const liveLayer = document.getElementById('live-layer');
-const liveStreamCanvas = document.getElementById('live-stream-canvas');
-const freezeIndicator = document.getElementById('freeze-indicator');
-let liveCanvasCtx = null;
-if (liveStreamCanvas) {
-  liveCanvasCtx = liveStreamCanvas.getContext('2d', { alpha: false, desynchronized: true });
+// Universal HTTP JSON Fetcher (Supports Fetch API and XMLHttpRequest Fallback)
+function safeFetchJson(url, callback) {
+  if (window.fetch) {
+    window.fetch(url)
+      .then(function(res) {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
+      .then(function(data) {
+        callback(null, data);
+      })
+      .catch(function(err) {
+        callback(err, null);
+      });
+  } else {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', url, true);
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState === 4) {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          try {
+            var parsed = JSON.parse(xhr.responseText);
+            callback(null, parsed);
+          } catch (e) {
+            callback(e, null);
+          }
+        } else {
+          callback(new Error('HTTP ' + xhr.status), null);
+        }
+      }
+    };
+    xhr.send(null);
+  }
 }
 
-// Set asynchronous decoding on image elements for butter-smooth rendering
-if (imgA) imgA.decoding = 'async';
-if (imgB) imgB.decoding = 'async';
+var channelId = getTargetChannelId();
+var STORAGE_KEY = 'signage_manifest_ch_' + channelId;
+var SESSION_START_TIME = Date.now();
+var MAX_SESSION_DURATION_MS = 24 * 60 * 60 * 1000; // 24-hour maintenance soft reload
+
+var playlist = [];
+var currentIndex = -1;
+var activeSlot = 'A'; // 'A' or 'B'
+var timerId = null;
+var eventSource = null;
+var sseRetryDelay = 3000;
+var isPlaying = false;
+var pendingNewPlaylist = null;
+var wakeLockSentinel = null;
+var isFrozen = false;
+var isLiveMode = false;
+var currentChannelName = tvT('channelPrefix') + channelId;
+
+// DOM Elements
+var slotA = document.getElementById('slotA');
+var slotB = document.getElementById('slotB');
+var imgA = document.getElementById('imgA');
+var imgB = document.getElementById('imgB');
+var vidA = document.getElementById('vidA');
+var vidB = document.getElementById('vidB');
+var standbyScreen = document.getElementById('standby-screen');
+var standbyTitle = document.getElementById('standby-title');
+var standbyBadge = document.getElementById('standby-badge');
+var fsBtn = document.getElementById('fs-btn');
+var netWarning = document.getElementById('net-warning');
+var antiSleepVideo = document.getElementById('anti-sleep-video');
+var liveLayer = document.getElementById('live-layer');
+var liveStreamCanvas = document.getElementById('live-stream-canvas');
+var freezeIndicator = document.getElementById('freeze-indicator');
+
+var liveCanvasCtx = null;
+if (liveStreamCanvas) {
+  try {
+    liveCanvasCtx = liveStreamCanvas.getContext('2d', { alpha: false });
+  } catch (e) {
+    try {
+      liveCanvasCtx = liveStreamCanvas.getContext('2d');
+    } catch (e2) {}
+  }
+}
+
+// Set asynchronous decoding on image elements if supported
+if (imgA && 'decoding' in imgA) imgA.decoding = 'async';
+if (imgB && 'decoding' in imgB) imgB.decoding = 'async';
 
 function init() {
   updateChannelNameDisplay(currentChannelName);
   setupIdleCursor();
 
   // Apply localized labels
-  const descEl = document.querySelector('.standby-desc');
+  var descEl = document.querySelector('.standby-desc');
   if (descEl) descEl.textContent = tvT('standbyDesc');
-  const tipEl = document.querySelector('.standby-tip');
+  var tipEl = document.querySelector('.standby-tip');
   if (tipEl) tipEl.innerHTML = tvT('standbyTip');
   if (fsBtn) fsBtn.textContent = tvT('fullscreen');
   if (freezeIndicator) freezeIndicator.textContent = tvT('freeze');
-  const liveText = document.querySelector('.live-text');
+  var liveText = document.querySelector('.live-text');
   if (liveText) liveText.textContent = tvT('live');
   if (netWarning) netWarning.textContent = tvT('netWarning');
 
-  fsBtn.addEventListener('click', toggleFullscreen);
-  window.addEventListener('keydown', (e) => {
+  if (fsBtn) {
+    fsBtn.addEventListener('click', toggleFullscreen);
+  }
+  window.addEventListener('keydown', function(e) {
     if (e.key === 'Enter' || e.key === ' ' || e.key === 'f' || e.keyCode === 13) {
       toggleFullscreen();
     }
   });
 
-  document.getElementById('player-container').addEventListener('dblclick', toggleFullscreen);
+  var container = document.getElementById('player-container');
+  if (container) {
+    container.addEventListener('dblclick', toggleFullscreen);
+  }
 
   // Load cached playlist from localStorage immediately for offline boot resilience
-  const cached = localStorage.getItem(STORAGE_KEY);
-  if (cached) {
-    try {
-      const parsed = JSON.parse(cached);
+  try {
+    var cached = localStorage.getItem(STORAGE_KEY);
+    if (cached) {
+      var parsed = JSON.parse(cached);
       if (Array.isArray(parsed) && parsed.length > 0) {
         playlist = parsed;
         window.playlist = parsed;
         hideStandbyScreen();
         playNextItem();
       }
-    } catch (e) {
-      console.warn('Failed to parse cached playlist:', e);
     }
+  } catch (e) {
+    console.warn('Failed to parse cached playlist:', e);
   }
 
   if (playlist.length === 0) {
@@ -176,17 +239,26 @@ function updateChannelNameDisplay(name) {
     currentChannelName = name;
   }
   if (standbyTitle) {
-    standbyTitle.textContent = `📺 ${currentChannelName}`;
+    standbyTitle.textContent = '📺 ' + currentChannelName;
   }
-  document.title = `${currentChannelName} - Smart TV Display`;
+  document.title = currentChannelName + ' - Smart TV Display';
 }
 
 function toggleFullscreen() {
   try {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(() => {});
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+      var el = document.documentElement;
+      if (el.requestFullscreen) {
+        el.requestFullscreen().catch(function() {});
+      } else if (el.webkitRequestFullscreen) {
+        el.webkitRequestFullscreen();
+      }
     } else {
-      document.exitFullscreen().catch(() => {});
+      if (document.exitFullscreen) {
+        document.exitFullscreen().catch(function() {});
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      }
     }
   } catch (e) {
     console.warn('Fullscreen request bypassed:', e);
@@ -194,15 +266,15 @@ function toggleFullscreen() {
 }
 
 // Auto-hide cursor and fullscreen button when idle
-let idleTimer = null;
+var idleTimer = null;
 function setupIdleCursor() {
-  const resetIdle = () => {
+  var resetIdle = function() {
     document.body.classList.remove('hide-cursor');
-    fsBtn.classList.remove('idle-hide');
+    if (fsBtn) fsBtn.classList.remove('idle-hide');
     clearTimeout(idleTimer);
-    idleTimer = setTimeout(() => {
+    idleTimer = setTimeout(function() {
       document.body.classList.add('hide-cursor');
-      fsBtn.classList.add('idle-hide');
+      if (fsBtn) fsBtn.classList.add('idle-hide');
     }, 3500);
   };
 
@@ -211,50 +283,59 @@ function setupIdleCursor() {
   resetIdle();
 }
 
-// Anti-Sleep Lock (Low-CPU & Releases Decoder Channels)
-async function initAntiSleep() {
-  if ('wakeLock' in navigator && navigator.wakeLock.request) {
+// Anti-Sleep Lock (Compatible with WakeLock API and canvas stream video fallback)
+function initAntiSleep() {
+  if ('wakeLock' in navigator && navigator.wakeLock && navigator.wakeLock.request) {
     try {
-      wakeLockSentinel = await navigator.wakeLock.request('screen');
-      wakeLockSentinel.addEventListener('release', () => {
-        wakeLockSentinel = null;
-      });
+      navigator.wakeLock.request('screen').then(function(sentinel) {
+        wakeLockSentinel = sentinel;
+        sentinel.addEventListener('release', function() {
+          wakeLockSentinel = null;
+        });
+      }).catch(function() {});
       return;
-    } catch {}
+    } catch (e) {}
   }
 
   if (!wakeLockSentinel && antiSleepVideo) {
     try {
       if (!antiSleepVideo.srcObject) {
-        const canvas = document.createElement('canvas');
+        var canvas = document.createElement('canvas');
         canvas.width = 4;
         canvas.height = 4;
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#000000';
-        ctx.fillRect(0, 0, 4, 4);
+        var ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.fillStyle = '#000000';
+          ctx.fillRect(0, 0, 4, 4);
+        }
 
         if (canvas.captureStream) {
           antiSleepVideo.srcObject = canvas.captureStream(0.5);
         }
       }
-      antiSleepVideo.play().catch(() => {});
+      var playPromise = antiSleepVideo.play();
+      if (playPromise && playPromise.catch) {
+        playPromise.catch(function() {});
+      }
     } catch (e) {
       console.warn('Anti-sleep fallback bypassed:', e);
     }
   }
 }
 
-document.addEventListener('visibilitychange', () => {
+document.addEventListener('visibilitychange', function() {
   if (document.visibilityState === 'visible') {
     initAntiSleep();
   }
 });
 
-async function fetchChannelData() {
-  try {
-    const res = await fetch(`/api/channels/${channelId}`);
-    if (res.ok) {
-      const data = await res.json();
+function fetchChannelData() {
+  safeFetchJson('/api/channels/' + channelId, function(err, data) {
+    if (err) {
+      console.warn('Offline or server unreachable, relying on cached playlist:', err);
+      return;
+    }
+    if (data) {
       if (data.name) {
         updateChannelNameDisplay(data.name);
       }
@@ -266,23 +347,25 @@ async function fetchChannelData() {
       }
       updatePlaylist(data.items || []);
     }
-  } catch (err) {
-    console.warn('Offline or server unreachable, relying on cached playlist:', err);
-  }
+  });
 }
 
 function updatePlaylist(newItems) {
   if (!newItems || newItems.length === 0) {
     playlist = [];
     window.playlist = [];
-    localStorage.removeItem(STORAGE_KEY);
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch (e) {}
     clearTimeout(timerId);
     isPlaying = false;
     showStandbyScreen();
     return;
   }
 
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(newItems));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(newItems));
+  } catch (e) {}
   window.playlist = newItems;
   playlist = newItems;
   pendingNewPlaylist = null;
@@ -307,15 +390,16 @@ function setFrozen(frozen) {
 
   clearTimeout(timerId);
   if (!isFrozen && !isLiveMode && playlist.length > 0) {
-    const currentItem = playlist[currentIndex] || playlist[0];
-    const durationMs = Math.max(2, (Number(currentItem?.duration) || 10)) * 1000;
+    var currentItem = playlist[currentIndex] || playlist[0];
+    var duration = (currentItem && currentItem.duration) ? Number(currentItem.duration) : 10;
+    var durationMs = Math.max(2, duration || 10) * 1000;
     timerId = setTimeout(playNextItem, durationMs);
   }
 }
 
 // Direct Slide Override / Jump Immediately
 function jumpToItem(targetIndex) {
-  const idx = parseInt(targetIndex, 10);
+  var idx = parseInt(targetIndex, 10);
   if (isNaN(idx) || idx < 0 || idx >= playlist.length) {
     return;
   }
@@ -331,8 +415,8 @@ function showLiveStream() {
     liveLayer.classList.remove('hidden');
   }
   // Pause any playing video in slots to save GPU
-  if (vidA) { try { vidA.pause(); } catch {} }
-  if (vidB) { try { vidB.pause(); } catch {} }
+  if (vidA) { try { vidA.pause(); } catch (e) {} }
+  if (vidB) { try { vidB.pause(); } catch (e) {} }
 }
 
 function hideLiveStream() {
@@ -345,52 +429,81 @@ function hideLiveStream() {
   }
 }
 
-let isDecodingFrame = false;
+var isDecodingFrame = false;
 
-function handleLiveFrame(arrayBuffer) {
+function handleLiveFrame(data) {
   if (!isLiveMode) {
     showLiveStream();
   }
   if (!liveStreamCanvas || !liveCanvasCtx) return;
 
-  const blob = new Blob([arrayBuffer], { type: 'image/jpeg' });
+  var blob;
+  try {
+    blob = (data instanceof Blob) ? data : new Blob([data], { type: 'image/jpeg' });
+  } catch (e) {
+    return;
+  }
 
-  // Use createImageBitmap for background-thread GPU decoding with ZERO paint flicker
+  // Modern browser hardware GPU decode
   if (window.createImageBitmap) {
-    if (isDecodingFrame) return; // Drop frame if previous is still blitting to prevent backlog
+    if (isDecodingFrame) return;
     isDecodingFrame = true;
-    createImageBitmap(blob).then((bitmap) => {
-      if (liveStreamCanvas.width !== bitmap.width || liveStreamCanvas.height !== bitmap.height) {
-        liveStreamCanvas.width = bitmap.width;
-        liveStreamCanvas.height = bitmap.height;
-      }
-      liveCanvasCtx.drawImage(bitmap, 0, 0);
-      bitmap.close();
+    window.createImageBitmap(blob).then(function(bitmap) {
+      try {
+        if (liveStreamCanvas.width !== bitmap.width || liveStreamCanvas.height !== bitmap.height) {
+          liveStreamCanvas.width = bitmap.width;
+          liveStreamCanvas.height = bitmap.height;
+        }
+        liveCanvasCtx.drawImage(bitmap, 0, 0);
+        if (bitmap.close) bitmap.close();
+      } catch (drawErr) {}
       isDecodingFrame = false;
-    }).catch(() => {
+    }).catch(function() {
       isDecodingFrame = false;
+      renderFrameViaImg(blob);
     });
   } else {
-    // Universal Fallback: pre-decode image completely before painting onto canvas
-    const img = new Image();
-    const url = URL.createObjectURL(blob);
-    img.onload = () => {
+    renderFrameViaImg(blob);
+  }
+}
+
+function renderFrameViaImg(blob) {
+  if (isDecodingFrame) return;
+  isDecodingFrame = true;
+  var urlCreator = window.URL || window.webkitURL;
+  if (!urlCreator || !urlCreator.createObjectURL) {
+    isDecodingFrame = false;
+    return;
+  }
+  var url = urlCreator.createObjectURL(blob);
+  var img = new Image();
+  img.onload = function() {
+    try {
       if (liveStreamCanvas.width !== img.naturalWidth || liveStreamCanvas.height !== img.naturalHeight) {
         liveStreamCanvas.width = img.naturalWidth;
         liveStreamCanvas.height = img.naturalHeight;
       }
       liveCanvasCtx.drawImage(img, 0, 0);
-      URL.revokeObjectURL(url);
-    };
-    img.src = url;
-  }
+    } catch (e) {}
+    try {
+      urlCreator.revokeObjectURL(url);
+    } catch (e) {}
+    isDecodingFrame = false;
+  };
+  img.onerror = function() {
+    try {
+      urlCreator.revokeObjectURL(url);
+    } catch (e) {}
+    isDecodingFrame = false;
+  };
+  img.src = url;
 }
 
 // Playback Rotation Loop with Zero-Leak Lifecycle & 24h Maintenance Reload
-function playNextItem(forcedIndex = null) {
+function playNextItem(forcedIndex) {
   clearTimeout(timerId);
 
-  // 24-Hour Maintenance Reload: resets browser V8 heap cleanly between slides
+  // 24-Hour Maintenance Reload: resets browser heap cleanly between slides
   if (Date.now() - SESSION_START_TIME > MAX_SESSION_DURATION_MS) {
     console.log('24h session maintenance: performing soft reload to purge browser heap...');
     window.location.reload();
@@ -416,9 +529,10 @@ function playNextItem(forcedIndex = null) {
     currentIndex = forcedIndex;
   } else {
     // Single static image optimization
-    if (playlist.length === 1 && !playlist[0].mime_type?.startsWith('video/') && currentIndex === 0) {
-      const currentItem = playlist[0];
-      const durationMs = Math.max(2, (Number(currentItem.duration) || 10)) * 1000;
+    if (playlist.length === 1 && (!playlist[0].mime_type || !playlist[0].mime_type.startsWith('video/')) && currentIndex === 0) {
+      var currentItem = playlist[0];
+      var singleDuration = (currentItem && currentItem.duration) ? Number(currentItem.duration) : 10;
+      var durationMs = Math.max(2, singleDuration || 10) * 1000;
       if (!isFrozen && !isLiveMode) {
         timerId = setTimeout(playNextItem, durationMs);
       }
@@ -427,65 +541,75 @@ function playNextItem(forcedIndex = null) {
     currentIndex = (currentIndex + 1) % playlist.length;
   }
 
-  const currentItem = playlist[currentIndex];
+  var item = playlist[currentIndex];
+  if (!item) return;
 
-  const targetSlot = (activeSlot === 'A') ? 'B' : 'A';
-  const targetSlotEl = (targetSlot === 'A') ? slotA : slotB;
-  const oldSlotEl = (targetSlot === 'A') ? slotB : slotA;
+  var targetSlot = (activeSlot === 'A') ? 'B' : 'A';
+  var targetSlotEl = (targetSlot === 'A') ? slotA : slotB;
+  var oldSlotEl = (targetSlot === 'A') ? slotB : slotA;
 
-  const targetImg = (targetSlot === 'A') ? imgA : imgB;
-  const targetVid = (targetSlot === 'A') ? vidA : vidB;
-  const oldVid = (targetSlot === 'A') ? vidB : vidA;
-  const oldImg = (targetSlot === 'A') ? imgB : imgA;
+  var targetImg = (targetSlot === 'A') ? imgA : imgB;
+  var targetVid = (targetSlot === 'A') ? vidA : vidB;
+  var oldVid = (targetSlot === 'A') ? vidB : vidA;
+  var oldImg = (targetSlot === 'A') ? imgB : imgA;
 
-  const isVideo = currentItem.mime_type && currentItem.mime_type.startsWith('video/');
+  var isVideo = item.mime_type && item.mime_type.startsWith('video/');
 
   if (isVideo) {
     if (antiSleepVideo && !antiSleepVideo.paused) {
-      try { antiSleepVideo.pause(); } catch {}
+      try { antiSleepVideo.pause(); } catch (e) {}
     }
 
     targetImg.classList.remove('visible');
     targetVid.classList.add('visible');
 
-    targetVid.src = currentItem.url;
+    targetVid.src = item.url;
     targetVid.muted = true;
     targetVid.playsInline = true;
 
-    targetVid.onended = () => {
+    targetVid.onended = function() {
       if (!isFrozen && !isLiveMode) {
         playNextItem();
       }
     };
 
-    targetVid.onerror = (e) => {
+    targetVid.onerror = function(e) {
       console.error('Video decode error, advancing:', e);
       if (!isFrozen && !isLiveMode) {
         timerId = setTimeout(playNextItem, 2000);
       }
     };
 
-    targetVid.play().then(() => {
+    var playProm = targetVid.play();
+    if (playProm && playProm.then) {
+      playProm.then(function() {
+        performCrossFade(targetSlotEl, oldSlotEl, oldVid, oldImg);
+        activeSlot = targetSlot;
+      }).catch(function(err) {
+        console.warn('Autoplay failed, falling back to timer:', err);
+        performCrossFade(targetSlotEl, oldSlotEl, oldVid, oldImg);
+        activeSlot = targetSlot;
+        if (!isFrozen && !isLiveMode) {
+          timerId = setTimeout(playNextItem, (item.duration || 10) * 1000);
+        }
+      });
+    } else {
       performCrossFade(targetSlotEl, oldSlotEl, oldVid, oldImg);
       activeSlot = targetSlot;
-    }).catch(err => {
-      console.warn('Autoplay failed, falling back to timer:', err);
-      performCrossFade(targetSlotEl, oldSlotEl, oldVid, oldImg);
-      activeSlot = targetSlot;
-      if (!isFrozen && !isLiveMode) {
-        timerId = setTimeout(playNextItem, (currentItem.duration || 10) * 1000);
-      }
-    });
+    }
   } else {
     if (antiSleepVideo && antiSleepVideo.paused && !wakeLockSentinel) {
-      antiSleepVideo.play().catch(() => {});
+      try {
+        var p = antiSleepVideo.play();
+        if (p && p.catch) p.catch(function() {});
+      } catch (e) {}
     }
 
     targetVid.classList.remove('visible');
     targetImg.classList.add('visible');
 
-    let handled = false;
-    const onImageLoaded = () => {
+    var handled = false;
+    var onImageLoaded = function() {
       if (handled) return;
       handled = true;
       targetImg.onload = null;
@@ -495,24 +619,25 @@ function playNextItem(forcedIndex = null) {
       activeSlot = targetSlot;
 
       if (!isFrozen && !isLiveMode) {
-        const durationMs = Math.max(2, (Number(currentItem.duration) || 10)) * 1000;
+        var itemDuration = (item && item.duration) ? Number(item.duration) : 10;
+        var durationMs = Math.max(2, itemDuration || 10) * 1000;
         timerId = setTimeout(playNextItem, durationMs);
       }
     };
 
     targetImg.onload = onImageLoaded;
-    targetImg.onerror = () => {
+    targetImg.onerror = function() {
       if (handled) return;
       handled = true;
       targetImg.onload = null;
       targetImg.onerror = null;
-      console.error('Image load failed:', currentItem.url);
+      console.error('Image load failed:', item.url);
       if (!isFrozen && !isLiveMode) {
         timerId = setTimeout(playNextItem, 2000);
       }
     };
 
-    targetImg.src = currentItem.url;
+    targetImg.src = item.url;
 
     if (targetImg.complete && targetImg.naturalWidth > 0) {
       onImageLoaded();
@@ -522,13 +647,17 @@ function playNextItem(forcedIndex = null) {
 
 // Hardware-Accelerated CSS Cross-Fade Transition & Complete Surface Purge
 function performCrossFade(targetSlotEl, oldSlotEl, oldVid, oldImg) {
-  targetSlotEl.classList.remove('inactive');
-  targetSlotEl.classList.add('active');
+  if (targetSlotEl) {
+    targetSlotEl.classList.remove('inactive');
+    targetSlotEl.classList.add('active');
+  }
 
-  oldSlotEl.classList.remove('active');
-  oldSlotEl.classList.add('inactive');
+  if (oldSlotEl) {
+    oldSlotEl.classList.remove('active');
+    oldSlotEl.classList.add('inactive');
+  }
 
-  setTimeout(() => {
+  setTimeout(function() {
     try {
       if (oldVid) {
         oldVid.pause();
@@ -545,19 +674,23 @@ function performCrossFade(targetSlotEl, oldSlotEl, oldVid, oldImg) {
 }
 
 function showStandbyScreen() {
-  standbyScreen.classList.remove('hidden');
+  if (standbyScreen) {
+    standbyScreen.classList.remove('hidden');
+  }
 }
 
 function hideStandbyScreen() {
-  standbyScreen.classList.add('hidden');
+  if (standbyScreen) {
+    standbyScreen.classList.add('hidden');
+  }
 }
 
 // Dual-Protocol Real-Time Sync (WebSocket primary, SSE fallback)
-let realTimeConn = null;
-let useWebSocket = true;
+var realTimeConn = null;
+var useWebSocket = true;
 
 function initRealTimeSync() {
-  if (useWebSocket && 'WebSocket' in window) {
+  if (useWebSocket && ('WebSocket' in window || 'MozWebSocket' in window)) {
     initWebSocket();
   } else {
     initSSE();
@@ -566,36 +699,42 @@ function initRealTimeSync() {
 
 function initWebSocket() {
   if (realTimeConn) {
-    try { realTimeConn.close(); } catch {}
+    try { realTimeConn.close(); } catch (e) {}
     realTimeConn = null;
   }
 
-  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-  const wsUrl = `${protocol}//${window.location.host}/ws/channels/${channelId}`;
+  var protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  var wsUrl = protocol + '//' + window.location.host + '/ws/channels/' + channelId;
 
   try {
-    const ws = new WebSocket(wsUrl);
+    var WSClass = window.WebSocket || window.MozWebSocket;
+    var ws = new WSClass(wsUrl);
     ws.binaryType = 'arraybuffer';
     realTimeConn = ws;
 
-    ws.onopen = () => {
-      console.log(`WebSocket connected for channel ${channelId}`);
+    ws.onopen = function() {
+      console.log('WebSocket connected for channel ' + channelId);
       sseRetryDelay = 3000;
-      netWarning.classList.add('hidden');
-      standbyBadge.className = 'standby-badge connected';
-      standbyBadge.textContent = tvT('connected');
+      if (netWarning) netWarning.classList.add('hidden');
+      if (standbyBadge) {
+        standbyBadge.className = 'standby-badge connected';
+        standbyBadge.textContent = tvT('connected');
+      }
+      if (window.__tvReport) {
+        window.__tvReport('info', 'TV connected to channel ' + channelId + ' via WebSocket');
+      }
     };
 
-    ws.onmessage = (event) => {
+    ws.onmessage = function(event) {
       // Binary Frame = Live Screen Stream JPEG
-      if (event.data instanceof ArrayBuffer) {
+      if (event.data instanceof ArrayBuffer || (window.Blob && event.data instanceof Blob)) {
         handleLiveFrame(event.data);
         return;
       }
 
       // JSON Control Messages
       try {
-        const msg = JSON.parse(event.data);
+        var msg = JSON.parse(event.data);
         switch (msg.event) {
           case 'connected':
             if (msg.data) {
@@ -635,17 +774,6 @@ function initWebSocket() {
             console.log('Live screen stream stopped');
             hideLiveStream();
             break;
-          case 'webrtc_offer':
-            if (msg.data && msg.data.sdp) {
-              console.log('Received WebRTC offer, negotiating high-fps stream...');
-              handleWebRtcOffer(msg.data.sdp);
-            }
-            break;
-          case 'webrtc_candidate':
-            if (msg.data) {
-              handleWebRtcCandidate(msg.data);
-            }
-            break;
           case 'force_reload':
             window.location.reload();
             break;
@@ -655,22 +783,24 @@ function initWebSocket() {
       }
     };
 
-    ws.onerror = () => {
-      if (ws.readyState !== WebSocket.OPEN) {
+    ws.onerror = function() {
+      if (ws.readyState !== 1) { // 1 = OPEN
         console.warn('WebSocket connection failed, falling back to SSE...');
         useWebSocket = false;
-        try { ws.close(); } catch {}
+        try { ws.close(); } catch (e) {}
         realTimeConn = null;
         initSSE();
       }
     };
 
-    ws.onclose = (e) => {
+    ws.onclose = function(e) {
       if (!useWebSocket) return;
-      console.warn(`WebSocket closed (${e.code}), retrying in ${(sseRetryDelay / 1000).toFixed(1)}s...`);
-      netWarning.classList.remove('hidden');
-      standbyBadge.className = 'standby-badge offline';
-      standbyBadge.textContent = tvT('offline');
+      console.warn('WebSocket closed, retrying in ' + (sseRetryDelay / 1000).toFixed(1) + 's...');
+      if (netWarning) netWarning.classList.remove('hidden');
+      if (standbyBadge) {
+        standbyBadge.className = 'standby-badge offline';
+        standbyBadge.textContent = tvT('offline');
+      }
       realTimeConn = null;
 
       setTimeout(initRealTimeSync, sseRetryDelay);
@@ -685,30 +815,41 @@ function initWebSocket() {
 
 function initSSE() {
   if (realTimeConn) {
-    try { realTimeConn.close(); } catch {}
+    try { realTimeConn.close(); } catch (e) {}
     realTimeConn = null;
   }
 
+  if (typeof EventSource === 'undefined') {
+    console.warn('EventSource is not supported on this TV. Using polling fallback.');
+    startPollingFallback();
+    return;
+  }
+
   try {
-    const es = new EventSource(`/api/channels/${channelId}/events`);
+    var es = new EventSource('/api/channels/' + channelId + '/events');
     realTimeConn = es;
 
-    es.addEventListener('connected', (e) => {
-      console.log(`SSE connected for channel ${channelId}`);
+    es.addEventListener('connected', function(e) {
+      console.log('SSE connected for channel ' + channelId);
       sseRetryDelay = 3000;
-      netWarning.classList.add('hidden');
-      standbyBadge.className = 'standby-badge connected';
-      standbyBadge.textContent = tvT('connected');
+      if (netWarning) netWarning.classList.add('hidden');
+      if (standbyBadge) {
+        standbyBadge.className = 'standby-badge connected';
+        standbyBadge.textContent = tvT('connected');
+      }
+      if (window.__tvReport) {
+        window.__tvReport('info', 'TV connected to channel ' + channelId + ' via SSE');
+      }
       try {
-        const data = JSON.parse(e.data);
+        var data = JSON.parse(e.data);
         if (typeof data.frozen === 'boolean') setFrozen(data.frozen);
         if (data.is_live) showLiveStream();
-      } catch {}
+      } catch (err) {}
     });
 
-    es.addEventListener('playlist_update', (e) => {
+    es.addEventListener('playlist_update', function(e) {
       try {
-        const data = JSON.parse(e.data);
+        var data = JSON.parse(e.data);
         console.log('Received playlist_update via SSE:', data);
         updatePlaylist(data.items || []);
       } catch (err) {
@@ -716,9 +857,9 @@ function initSSE() {
       }
     });
 
-    es.addEventListener('jump_to_item', (e) => {
+    es.addEventListener('jump_to_item', function(e) {
       try {
-        const data = JSON.parse(e.data);
+        var data = JSON.parse(e.data);
         if (typeof data.index === 'number') {
           jumpToItem(data.index);
         }
@@ -727,9 +868,9 @@ function initSSE() {
       }
     });
 
-    es.addEventListener('freeze_toggle', (e) => {
+    es.addEventListener('freeze_toggle', function(e) {
       try {
-        const data = JSON.parse(e.data);
+        var data = JSON.parse(e.data);
         if (typeof data.frozen === 'boolean') {
           setFrozen(data.frozen);
         }
@@ -738,9 +879,9 @@ function initSSE() {
       }
     });
 
-    es.addEventListener('channel_renamed', (e) => {
+    es.addEventListener('channel_renamed', function(e) {
       try {
-        const data = JSON.parse(e.data);
+        var data = JSON.parse(e.data);
         if (data.name) {
           updateChannelNameDisplay(data.name);
         }
@@ -749,24 +890,26 @@ function initSSE() {
       }
     });
 
-    es.addEventListener('live_start', () => {
+    es.addEventListener('live_start', function() {
       showLiveStream();
     });
 
-    es.addEventListener('live_stop', () => {
+    es.addEventListener('live_stop', function() {
       hideLiveStream();
     });
 
-    es.addEventListener('force_reload', () => {
+    es.addEventListener('force_reload', function() {
       window.location.reload();
     });
 
-    es.onerror = () => {
-      console.warn(`SSE connection dropped, retrying in ${(sseRetryDelay / 1000).toFixed(1)}s...`);
-      netWarning.classList.remove('hidden');
-      standbyBadge.className = 'standby-badge offline';
-      standbyBadge.textContent = tvT('offline');
-      try { es.close(); } catch {}
+    es.onerror = function() {
+      console.warn('SSE connection dropped, retrying in ' + (sseRetryDelay / 1000).toFixed(1) + 's...');
+      if (netWarning) netWarning.classList.remove('hidden');
+      if (standbyBadge) {
+        standbyBadge.className = 'standby-badge offline';
+        standbyBadge.textContent = tvT('offline');
+      }
+      try { es.close(); } catch (e) {}
       realTimeConn = null;
 
       setTimeout(initRealTimeSync, sseRetryDelay);
@@ -774,5 +917,20 @@ function initSSE() {
     };
   } catch (err) {
     console.error('SSE init error:', err);
+    startPollingFallback();
   }
+}
+
+// Fallback polling for very old Smart TVs without WebSocket or EventSource
+var pollingTimer = null;
+function startPollingFallback() {
+  if (pollingTimer) clearInterval(pollingTimer);
+  console.log('Initiating HTTP polling fallback for legacy TV...');
+  if (standbyBadge) {
+    standbyBadge.className = 'standby-badge connected';
+    standbyBadge.textContent = tvT('connected') + ' (Polling)';
+  }
+  pollingTimer = setInterval(function() {
+    fetchChannelData();
+  }, 5000);
 }

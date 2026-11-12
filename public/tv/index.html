@@ -53,6 +53,41 @@
   <!-- Network Warning Indicator (Shown only if disconnected) -->
   <div id="net-warning" class="net-warning hidden">⚠️ หลุดการเชื่อมต่อกับเซิร์ฟเวอร์ กำลังเชื่อมต่อใหม่...</div>
 
+  <!-- TV On-Screen Debug Banner (Visible only if an unhandled error occurs) -->
+  <div id="tv-debug-box" class="tv-debug-box"></div>
+
+  <!-- Early Diagnostics for Legacy Smart TVs (Catches SyntaxErrors & reports to Server) -->
+  <script>
+    (function() {
+      window.__tvReport = function(level, msg) {
+        try {
+          var xhr = new XMLHttpRequest();
+          xhr.open('POST', '/api/tv-log', true);
+          xhr.setRequestHeader('Content-Type', 'application/json');
+          xhr.send(JSON.stringify({
+            level: level,
+            message: msg,
+            url: window.location.href,
+            ua: navigator.userAgent,
+            screen: window.screen ? (window.screen.width + 'x' + window.screen.height) : 'unknown'
+          }));
+        } catch (e) {}
+      };
+
+      window.onerror = function(msg, url, line, col) {
+        var str = 'JS Error: ' + msg + ' (Line: ' + line + ')';
+        var box = document.getElementById('tv-debug-box');
+        if (box) {
+          box.textContent = str;
+          box.style.display = 'block';
+        }
+        window.__tvReport('error', str);
+      };
+
+      // Telemetry heartbeat on TV boot
+      window.__tvReport('info', 'TV Booting channel: ' + window.location.pathname);
+    })();
+  </script>
   <script src="/tv/player.js"></script>
 </body>
 </html>

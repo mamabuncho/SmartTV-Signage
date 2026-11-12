@@ -28,6 +28,10 @@ body.hide-cursor {
 /* Dual Buffer Container */
 #player-container {
   position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   inset: 0;
   width: 100vw;
   height: 100vh;
@@ -38,11 +42,17 @@ body.hide-cursor {
 /* Dual Buffer Slots */
 .media-slot {
   position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   inset: 0;
   width: 100%;
   height: 100%;
   transition: opacity 0.45s cubic-bezier(0.25, 1, 0.5, 1);
+  -webkit-transition: opacity 0.45s cubic-bezier(0.25, 1, 0.5, 1);
   transform: translateZ(0);
+  -webkit-transform: translateZ(0);
   will-change: opacity;
   display: flex;
   align-items: center;
@@ -91,6 +101,10 @@ body.hide-cursor {
 
 .standby-overlay {
   position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   inset: 0;
   background: radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.12) 0%, transparent 45%),
               radial-gradient(circle at 90% 80%, rgba(99, 102, 241, 0.12) 0%, transparent 45%),
@@ -100,6 +114,7 @@ body.hide-cursor {
   justify-content: center;
   z-index: 10;
   transition: opacity 0.35s ease;
+  -webkit-transition: opacity 0.35s ease;
 }
 
 .standby-overlay.hidden {
@@ -266,6 +281,10 @@ body.hide-cursor {
 
 .live-overlay {
   position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   inset: 0;
   width: 100vw;
   height: 100vh;
@@ -275,6 +294,25 @@ body.hide-cursor {
   align-items: center;
   justify-content: center;
   transition: opacity 0.25s ease;
+  -webkit-transition: opacity 0.25s ease;
+}
+
+.tv-debug-box {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  right: 1.5rem;
+  background: rgba(15, 23, 42, 0.92);
+  color: #f87171;
+  border: 1px solid #dc2626;
+  border-radius: 12px;
+  padding: 0.85rem 1.25rem;
+  font-family: monospace;
+  font-size: 0.9rem;
+  z-index: 9999;
+  display: none;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+  word-break: break-all;
 }
 
 .live-overlay.hidden {
