@@ -1,0 +1,131 @@
+,,,,,,,,,,,,,,,,
+,[Project Overview],,,,,[Expected Hrs Summary],,,,,,,,,,
+,Project:,Nihonmatsu Castle,,,,Area/PIC,Jads,Bank,Nick,Yim,Total,,,,,
+,Type:,To ADJUST the original data in 2021,,,,O,0,2,0.8,0.8,3.5999999999999996,,,,,
+,Period:,February,", 2026",,,P,0,15,2.2,2.2,19.4,,,,,
+,,,,,,Q,0,8,1,1,10,,,,,
+,,,,,,R,0,11,1,1,13,,,,,
+,[Internal Check],,,,,Total Hrs,0,36,5,5,46,,,,,
+,PIC 1:,Bank,as a Main Creator,,,,,,,,,,,,,
+,PIC 2:,-,as a Sub Creator,,,,,,,,,,,,,
+,PIC 3:,Nick,as a Quality Control 1,,,,[Expected Hrs Summary],,,,,,[Deadline Definition],,,
+,PIC 4:,Yim,as a Quality Control 2,,,,Name/Fee,Monthly,Hourly,Sub-total,Total,,Deadline 1:,3D team to cross-check each by,,
+,,,,,,,Jads,70000,437.5,0,33437.5,,Deadline 2:,Yim-san to re-confirm each by,,
+,,,,,,,Bank,50000,312.5,11250,,,Deadline 3:,Gen to submit Max File to Mr. Sugano,,
+,[Area O-R],,,,[Info by Toppan],,Nick,50000,312.5,1562.5,or,,,,,
+,Area O, - Entrance of Building A,,,(Page 2),,Yim,60000,375,1875,165181.25,,,,,
+,Area P, - Stone Tiles of Gate,,,(Page 3-6),,Gen,300000,1875,18750,,,,,,
+,Area Q, - Around Yagura,,,(Page 7),,,,,1THB=,4.94,,,,,
+,Area R, - Fence Adjustment around Building A,,,(Page 8-9),,,,,,,,,,,
+,,,,,,,,[Expected Hrs by 3D & Yim],,,,,,,,
+,Area & Page,To-do by 3D & Yim-san,,,,,,Jads,Bank,Nick,Yim,,[Master Schedule - O],,,
+,O,O1: ,To adjust WIDTH of C & D on Page 2,,,,,0,0.5,0.2,0.2,,Deadline 1:,By 3D,"Tue., 17th Feb",", 2026"
+,,, - Gaps of C & D are not the same now & to make it same width,,,,,(hrs),(hrs),(hrs),(hrs),,Deadline 2:,By Yim-san,"Wed., 18th Feb",", 2026"
+,,O2: ,To place tiny layer of stone below C & D on Page 2,,,,,0,0.5,0.2,0.2,,Deadline 3:,To Client,"Thu., 19th Feb",", 2026"
+,,," - Refer to those thin stones as ""E""",,,,,(hrs),(hrs),(hrs),(hrs),,,,,
+,,O3: ,To close gap between COLUMN bottom to floor on Page 2,,,,,0,0.5,0.2,0.2,,,,,
+,,, - Currently tiny gaps between below column,,,,,(hrs),(hrs),(hrs),(hrs),,,,,
+,,O4: ,"To level stone tiles to be ""B"" on Page 2",,,,,0,0.5,0.2,0.2,,,,,
+,,," - Stone tiles are not levelled and ""B"" to be applied on other side",,,,,(hrs),(hrs),(hrs),(hrs),,,,,
+,(Page 2),,,,,,Sub Total Page 2:,0,2,0.8,0.8,,,,,
+,,,,,,,,,,,,,,,,
+,P,P1: ,To add stone tiles under the roof structure,,,,,0,0.5,0.2,0.2,,[Master Schedule - P],,,
+,,," - To apply stone tiles in red dots, 90cm OUT of columns",,,,,(hrs),(hrs),(hrs),(hrs),,Deadline 1:,By 3D,"Tue., 17th Feb",", 2026"
+,,P2: ,To make doors ONLY INSIDE around stone tiles,,,,,0,2,0.2,0.2,,Deadline 2:,By Yim-san,"Wed., 18th Feb",", 2026"
+,,, - Only inside as a sketch from Client with 2 Small & 1 Big on Page 3,,,,,(hrs),(hrs),(hrs),(hrs),,Deadline 3:,To Client,"Thu., 19th Feb",", 2026"
+,(Page 3),,,,,,Sub Total Page 3:,0,2.5,0.4,0.4,,,,,
+,,,,,,,,,,,,,,,,
+,P,P3: ,To adjust stone tiles to be HORIZONTAL basis,,,,,0,1,0.2,0.2,,[Master Schedule - P],,,
+,,, - NOT like vertical @ Fukui Castle,,,,,(hrs),(hrs),(hrs),(hrs),,Deadline 1:,By 3D,"Tue., 17th Feb",", 2026"
+,,P4: ,"To adjust stone tiles to be same size as ""B""",,,,,0,1.5,0.2,0.2,,Deadline 2:,By Yim-san,"Wed., 18th Feb",", 2026"
+,,," - Current size of ""B"" from Page 2 to apply in HORIZONTAL",,,,,(hrs),(hrs),(hrs),(hrs),,Deadline 3:,To Client,"Thu., 19th Feb",", 2026"
+,,P5: ,To add thin layer of stone tile AROUND the horizontal,,,,,0,1.5,0.2,0.2,,,,,
+,,, - Reference of thin layer @ Fukui Castle,,,,,(hrs),(hrs),(hrs),(hrs),,,,,
+,(Page 4),,,,,,Sub Total Page 4:,0,4,0.60000000000000009,0.60000000000000009,,,,,
+,,,,,,,,,,,,,,,,
+,P,P6: ,To adjust TOP STONE CORRIDOR as shown in red (1span),,,,,0,1.5,0.2,0.2,,[Master Schedule - P],,,
+,,," - To corridor on Page 5 and to adjust angle & size (1span=1,910mm)",,,,,(hrs),(hrs),(hrs),(hrs),,Deadline 1:,By 3D,"Tue., 17th Feb",", 2026"
+,,P7: ,To adjust BOTTOM STONE CORRIDOR as shown in red (1.5 span),,,,,0,1.5,0.2,0.2,,Deadline 2:,By Yim-san,"Wed., 18th Feb",", 2026"
+,,," - To corridor on Page 5 and to adjust angle & size (1.5 san = 2,865 mm)",,,,,(hrs),(hrs),(hrs),(hrs),,Deadline 3:,To Client,"Thu., 19th Feb",", 2026"
+,,P8: ,To connect both CORRIDORS Left & Right to P5,,,,,0,1.5,0.2,0.2,,,,,
+,,, - Both corridors to hit the thin layer of P5,,,,,(hrs),(hrs),(hrs),(hrs),,,,,
+,(Page 5),,,,,,Sub Total Page 5:,0,4.5,0.60000000000000009,0.60000000000000009,,,,,
+,,,,,,,,,,,,,,,,
+,P,P9: ,To adjust A - TOP to have VERTICAL 4 & 2 Thin Layers,,,,,0,1,0.2,0.2,,[Master Schedule - P],,,
+,,, - A is the one on top with narrow way,,,,,(hrs),(hrs),(hrs),(hrs),,Deadline 1:,By 3D,"Tue., 17th Feb",", 2026"
+,,P10: ,To adjust B - BOTTOM to have VERTICAL 6 & 2 Thin Layers,,,,,0,1.5,0.2,0.2,,Deadline 2:,By Yim-san,"Wed., 18th Feb",", 2026"
+,,, - B is the one on bottom with wide way,,,,,(hrs),(hrs),(hrs),(hrs),,Deadline 3:,To Client,"Thu., 19th Feb",", 2026"
+,,P11: ,To finally adjust stone sizes,,,,,0,1.5,0.2,0.2,,,,,
+,,," - Feel free to adjust those pieces, some could be smaller",,,,,(hrs),(hrs),(hrs),(hrs),,,,,
+,(Page 6),,,,,,Sub Total Page 6:,0,4,0.60000000000000009,0.60000000000000009,,,,,
+,,,,,,,,,,,,,,,,
+,Q,Q1: ,"To add ""UMEBACHIGEGYO"" in between roof line as ""①""",,,,,0,1,0.2,0.2,,[Master Schedule - Q],,,
+,,, - See the white object with black thing around the roof  from Client ,,,,,(hrs),(hrs),(hrs),(hrs),,Deadline 1:,By 3D,"Tue., 17th Feb",", 2026"
+,,Q2: ,"To adjust a door with STONE STEPS as ""②""",,,,,0,1.5,0.2,0.2,,Deadline 2:,By Yim-san,"Wed., 18th Feb",", 2026"
+,,, - See wooden door & stone steps from Client,,,,,(hrs),(hrs),(hrs),(hrs),,Deadline 3:,To Client,"Thu., 19th Feb",", 2026"
+,,Q3: ,"To add stone structure of ""SHIKIISHI"" underneath of Yagura",,,,,0,1.5,0.2,0.2,,,,,
+,,," - See ""SHIKIISHI' reference from Client",,,,,(hrs),(hrs),(hrs),(hrs),,,,,
+,,Q4: ,"To re-make wall of ""B"" to be yellow line from Client",,,,,0,2,0.2,0.2,,,,,
+,,, - So that we can have Q2 - Wooden Door & Stone Steps,,,,,(hrs),(hrs),(hrs),(hrs),,,,,
+,,Q5: ,"To adjust ground level to the fence of ""⑤” on Page 7",,,,,0,2,0.2,0.2,,,,,
+,,,- Make sure to close gaps between floor & fence,,,,,(hrs),(hrs),(hrs),(hrs),,,,,
+,(Page 7),,,,,,Sub Total Page 7:,0,8,1,1,,,,,
+,,,,,,,,,,,,,,,,
+,R,R1: ,To re-position the wall pointed in red circle on Page 8,,,,,0,1.5,0.2,0.2,,[Master Schedule -R],,,
+,,, - Currently on RED DOTS  but actual line to be YELLOW by Client,,,,,(hrs),(hrs),(hrs),(hrs),,Deadline 1:,By 3D,"Tue., 17th Feb",", 2026"
+,,R2: ,"To expand ""C"" all the way to the column by Client",,,,,0,1.5,0.2,0.2,,Deadline 2:,By Yim-san,"Wed., 18th Feb",", 2026"
+,,, - Current fence is too short and to be expanded,,,,,(hrs),(hrs),(hrs),(hrs),,Deadline 3:,To Client,"Thu., 19th Feb",", 2026"
+,,R3: ,"To adjust the end of ""C"" to be reference from Client",,,,,0,2,0.2,0.2,,,,,
+,,, - Ceiling structuer is coming OUT a bit as BLUE DOTS by Client,,,,,(hrs),(hrs),(hrs),(hrs),,,,,
+,(Page 8),,,,,,Sub Total Page 8:,0,5,0.60000000000000009,0.60000000000000009,,,,,
+,,,,,,,,,,,,,,,,
+,R,R4: , To add key columns in between fence ,,,,,0,3,0.2,0.2,,[Master Schedule -R],,,
+,,," - 1 span = 1,910mm = Key columns as reference from Client",,,,,(hrs),(hrs),(hrs),(hrs),,Deadline 1:,By 3D,"Tue., 17th Feb",", 2026"
+,,R5: ,To add above for entire fence from the Building A,,,,,0,3,0.2,0.2,,Deadline 2:,By Yim-san,"Wed., 18th Feb",", 2026"
+,,, - Lots of key columns to be added along the fence,,,,,(hrs),(hrs),(hrs),(hrs),,Deadline 3:,To Client,"Thu., 19th Feb",", 2026"
+,(Page 9),,,,,,Sub Total Page 9:,0,6,0.4,0.4,,,,,
+,Area & Page,To-do by 3D & Yim-san,,,,,,Jads,Bank,Nick,Yim,,,,,
+,,,,,,,,,,,,,,,,,
+,[Project Overview],,,,,,[Deadline Definition],,,,,[Expected Hrs Summary],,,,,
+,End Client:,TOSHIBA Lighting & Technology Corporation (TOSHIBA),,,,,Deadline 1:,3D team to cross-check each by,,,,Angle/PIC,Jads,Nick,Yim,Gen,Total
+,Actual Client:,TOPPAN Graphic Communications Inc. (TGC),,,,,Deadline 2:,Yim-san to re-confirm each by,,,,1,,,,2,2
+,Actual P.I.C.:,Mr. Ichiro Wakatsuki,,,,,,Deadline 3:,Gen to submit certain file to Mr. Wakatsuki,,,,2,,,,2,2
+,Project:,Home Lighting E-catalogue for Japan Market,,,,,,,,,,3,,,,2,2
+,Period:,February till April 2026,,,,,[File Format],,,,,4,,,,2,2
+,,,,,,, NO ideas types of file to be submitted to Client,,,,,5,,,,2,2
+,[Hansa Team Member],,,,,, - Sample:  by JPG,,,,,Total Hrs,0,0,0,10,10
+,PIC 1:,Jads,as a Main Creator,,,, - Final: by TIF,,,,,,,,,,
+,PIC 2:,Nick,as a Sub Creator,,,,,,,,,,,,,,
+,PIC 3:,Yim,as a Quality Control,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,
+,[Scope - Tentative],,,,,,,,,,,[Expected Quotation/Invoice Amount],,,,,
+,Possible 1:, - To develop GREY-OUT base model (SAMPLE MODEL with no colors),,,,, ,,,,,Name/Fee,Monthly,Hourly,Sub-total,Total,
+,Possible 2:, - To develop actual model (angle) with supports by TGC (ONLY SOME NEW),,,,,,,,,,Jads,70000,437.5,0,18750,
+,Possible 3:, - To develop full model (angle) with NO supports by TGC (ALL NEW),,,,,,,,,,Nick,50000,312.5,0,or,
+,Possible 4:, - To develop certain furniture/item/product (Limited but ALL NEW),,,,,,,,,,Yim,60000,375,0,92625.000000000015,
+,Possible 5:, - To purchase certain texture/model ONLINE (Purchase by Yim-san),,,,,,,,,,Gen,300000,1875,18750,,
+,,,,,,,,,,,,,,,1THB=,4.94,
+,[Internal & Catalogue Link],,,,,,,,,,,,,,,,
+, Link1: ,https://1drv.ms/f/c/ae2d06d2d5a4129d/IgDQp36zuRSCQrsAJzF2sSpSAa4zT4ebKyWcNHMTgNRasnc ,,,,,,,,,,,,,,,
+,," Above by Gen for Hansa only, 2. for TGC, 1. for TOSHIBA Lighting & Technology Corporation",,,,,,,,,,,,,,,
+, Link2: ,https://page2.cextension.jp/library/books/c4619/book/index.html#target/page_no=1  ,,,,,,,,,,,,,,,
+,, Above link by Client as actual E-catalogue & TGC is making this for TOSHIBA over 10 years…,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,
+,,,,,,,,[Expected Hrs by 3D & Yim],,,,,,,,,
+,Angle,To-do by 3D & Yim-san,,,,,,Jads,Nick,Yim,,[Master Schedule - Angle 1],,,,,
+,No. 5,5.1: ,To study this PAST DATA of Exterior Front with Car in the past,,,,,,,,,Deadline 1:,By 3D,(TBC),", 2026",,
+,,,"(Based on this past data, Hansa to make a new angle from SIDE in the dark)",,,,,(hrs),(hrs),(hrs),,Deadline 2:,By Yim-san,(TBC),", 2026",,
+,,5.2: ,"Dia. 75 mm downlight, 4,158x4,158 (Final) & 2,000x2,000 (Sample) Pixels",,,,,,,,,Deadline 3:,To Client,(TBC),", 2026",,
+,,,(Basic set-up for final submission & sample PIXELS),,,,,(hrs),(hrs),(hrs),,,,,,,
+,,5.3: ,To prepare SAMPLE then FINAL angle in the dark with Dia. 75 mm downlights,,,,,,,,,,,,,,
+,,,(NO need to be exactly the same as Sample Angle from TGC),,,,,(hrs),(hrs),(hrs),,,,,,,
+,Out Home Car,,,,,,Sub-total with No.5:,0,0,0,,,,,,,
+,,,,,,,,,,,,,,,,,
+,No. 7,7.1: ,Pending due to NO information from Client yet but 3 types of lights,,,,,,,,,[Master Schedule - Angle 2],,,,,
+,,,"(Additional green by Client but still pending, Downlights, Spike Light, & Spot Lights)",,,,,(hrs),(hrs),(hrs),,Deadline 1:,By 3D,(TBC),", 2026",,
+,,7.2: ,"Dia. 125or150 mm downlight, 4,158x4,158 (Final) & 2,000x2,000 (Sample) Pixels",,,,,,,,,Deadline 2:,By Yim-san,(TBC),", 2026",,
+,,,(Basic set-up for final submission & sample PIXELS),,,,,(hrs),(hrs),(hrs),,Deadline 3:,To Client,(TBC),", 2026",,
+,,7.3: ,To prepare SAMPLE then FINAL angle outside with Dia. 125or150 mm downlights,,,,,,,,,,,,,,
+,,,(NO need to be exactly the same as Sample Angle from TGC),,,,,(hrs),(hrs),(hrs),,,,,,,
+,Out Home 3,,,,,,Sub-total with No.7:,0,0,0,,,,,,,

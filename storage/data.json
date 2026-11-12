@@ -1,0 +1,167 @@
+{
+  "channels": [
+    {
+      "id": 1,
+      "name": "ห้องประชุม บอร์ดบริหาร",
+      "resolution": "1920x1080"
+    },
+    {
+      "id": 2,
+      "name": "Channel 2 (Room 2)",
+      "resolution": "1920x1080"
+    },
+    {
+      "id": 3,
+      "name": "Channel 3 (Room 3)",
+      "resolution": "1920x1080"
+    },
+    {
+      "id": 4,
+      "name": "Channel 4 (Room 4)",
+      "resolution": "1920x1080"
+    },
+    {
+      "id": 5,
+      "name": "Channel 5 (Room 5)",
+      "resolution": "1920x1080"
+    },
+    {
+      "id": 6,
+      "name": "Channel 6 (Room 6)",
+      "resolution": "1920x1080"
+    }
+  ],
+  "media_assets": {
+    "498377d4c8a57c85": {
+      "id": "498377d4c8a57c85",
+      "filename": "498377d4c8a57c85.mp4",
+      "original_name": "Extreme_closeup_a_202506201212_gpwnn.mp4",
+      "mime_type": "video/mp4",
+      "byte_size": 2252181,
+      "width": 1920,
+      "height": 1080,
+      "duration": 8,
+      "created_at": "2026-11-11T18:08:07.733Z"
+    },
+    "60bf15f05f30bee5": {
+      "id": "60bf15f05f30bee5",
+      "filename": "60bf15f05f30bee5.mp4",
+      "original_name": "The_man_picked_202506131410_ib483.mp4",
+      "mime_type": "video/mp4",
+      "byte_size": 3520920,
+      "width": 1920,
+      "height": 1080,
+      "duration": 15,
+      "created_at": "2026-11-11T18:09:18.775Z"
+    },
+    "640117af55aaac49": {
+      "id": "640117af55aaac49",
+      "filename": "640117af55aaac49.mp4",
+      "original_name": "0417.mp4",
+      "mime_type": "video/mp4",
+      "byte_size": 10766415,
+      "width": 1920,
+      "height": 1080,
+      "duration": 10,
+      "created_at": "2026-11-11T18:10:28.724Z"
+    },
+    "38f777af310ce9ed": {
+      "id": "38f777af310ce9ed",
+      "filename": "38f777af310ce9ed.mp4",
+      "original_name": "001_AJ_finalcut_RENDER.mp4",
+      "mime_type": "video/mp4",
+      "byte_size": 57569986,
+      "width": 1920,
+      "height": 1080,
+      "duration": 29.9,
+      "created_at": "2026-11-11T18:13:38.291Z"
+    },
+    "475d17d7b116badc": {
+      "id": "475d17d7b116badc",
+      "filename": "475d17d7b116badc.mp4",
+      "original_name": "Ayutthaya.mp4",
+      "mime_type": "video/mp4",
+      "byte_size": 52230365,
+      "width": 1920,
+      "height": 1080,
+      "duration": 23.9,
+      "created_at": "2026-11-11T18:14:43.904Z"
+    },
+    "52c280dbce2f5c62": {
+      "id": "52c280dbce2f5c62",
+      "filename": "52c280dbce2f5c62.mp4",
+      "original_name": "VIDEO_hansa_CG_interior.mp4",
+      "mime_type": "video/mp4",
+      "byte_size": 299245710,
+      "width": 1920,
+      "height": 1080,
+      "duration": 15,
+      "created_at": "2026-11-11T18:24:07.612Z"
+    },
+    "e48ad814ac32b702": {
+      "id": "e48ad814ac32b702",
+      "filename": "e48ad814ac32b702.mp4",
+      "original_name": "Playground equipment(1).mp4",
+      "mime_type": "video/mp4",
+      "byte_size": 92459087,
+      "width": 1920,
+      "height": 1080,
+      "duration": 40.1,
+      "created_at": "2026-11-11T18:26:24.508Z"
+    }
+  },
+  "playlists": {
+    "1": [
+      {
+        "asset_id": "sample_asset_1",
+        "duration": 15,
+        "order": 0
+      }
+    ],
+    "2": [
+      {
+        "asset_id": "60bf15f05f30bee5",
+        "duration": 15,
+        "order": 0
+      },
+      {
+        "asset_id": "640117af55aaac49",
+        "duration": 10,
+        "order": 1
+      },
+      {
+        "asset_id": "498377d4c8a57c85",
+        "duration": 8,
+        "order": 2
+      }
+    ],
+    "3": [
+      {
+        "asset_id": "38f777af310ce9ed",
+        "duration": 29.9,
+        "order": 0
+      }
+    ],
+    "4": [
+      {
+        "asset_id": "475d17d7b116badc",
+        "duration": 23.9,
+        "order": 0
+      }
+    ],
+    "5": [
+      {
+        "asset_id": "52c280dbce2f5c62",
+        "duration": 15,
+        "order": 0
+      }
+    ],
+    "6": [
+      {
+        "asset_id": "e48ad814ac32b702",
+        "duration": 40.1,
+        "order": 0
+      }
+    ]
+  }
+}

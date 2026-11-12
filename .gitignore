@@ -1,0 +1,24 @@
+# Node dependencies
+node_modules/
+
+# Distribution package
+dist/
+
+# Storage media and cache (preserve directory structure via .gitkeep)
+storage/media/*
+!storage/media/.gitkeep
+storage/temp/*
+!storage/temp/.gitkeep
+storage/test-screenshots/
+storage/data.json.tmp*
+
+# Environment and sensitive files
+.env
+.env.local
+*.log
+
+# OS & Editor generated files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

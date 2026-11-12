@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Smart TV Display</title>
+  <link rel="stylesheet" href="/tv/style.css">
+</head>
+<body>
+  <!-- Dual-Buffer Slots -->
+  <div id="player-container">
+    <div id="slotA" class="media-slot active">
+      <img id="imgA" class="media-element" alt="">
+      <video id="vidA" class="media-element" muted playsinline></video>
+    </div>
+    <div id="slotB" class="media-slot inactive">
+      <img id="imgB" class="media-element" alt="">
+      <video id="vidB" class="media-element" muted playsinline></video>
+    </div>
+  </div>
+
+  <!-- Live Screen Share Layer (Admin Screen Stream - Flicker-Free Hardware Canvas) -->
+  <div id="live-layer" class="live-overlay hidden">
+    <canvas id="live-stream-canvas" class="live-stream-canvas"></canvas>
+    <div class="live-indicator">
+      <span class="live-pulse-dot"></span>
+      <span class="live-text">🔴 ถ่ายทอดสดหน้าจอคอมพิวเตอร์</span>
+    </div>
+  </div>
+
+  <!-- Freeze Indicator (Shown when slide is locked) -->
+  <div id="freeze-indicator" class="freeze-indicator hidden">
+    ❄️ ล็อคภาพนิ่ง (Freeze)
+  </div>
+
+  <!-- Background Anti-Sleep Video (Prevents TV Screensaver over HTTP) -->
+  <video id="anti-sleep-video" loop muted playsinline aria-hidden="true"></video>
+
+  <!-- Standby Screen (Shown only when playlist is empty) -->
+  <div id="standby-screen" class="standby-overlay hidden">
+    <div class="standby-card">
+      <div class="standby-icon">📺</div>
+      <h1 id="standby-title">Smart TV ช่อง 1</h1>
+      <div id="standby-badge" class="standby-badge connected">● เชื่อมต่อเซิร์ฟเวอร์แล้ว (ออนไลน์)</div>
+      <p class="standby-desc">พร้อมรับภาพหรือวิดีโอจากหน้าแอดมิน</p>
+      <div class="standby-tip">💡 เพิ่มรูปภาพหรือสไลด์ที่หน้าควบคุมคอมพิวเตอร์ แล้วกด <b>"บันทึกและส่งเข้าทีวี"</b></div>
+    </div>
+  </div>
+
+  <!-- Fullscreen Toggle Button -->
+  <button id="fs-btn" class="fs-button" title="คลิกหรือแตะเพื่อขยายเต็มจอ">⛶ เต็มจอ</button>
+
+  <!-- Network Warning Indicator (Shown only if disconnected) -->
+  <div id="net-warning" class="net-warning hidden">⚠️ หลุดการเชื่อมต่อกับเซิร์ฟเวอร์ กำลังเชื่อมต่อใหม่...</div>
+
+  <script src="/tv/player.js"></script>
+</body>
+</html>

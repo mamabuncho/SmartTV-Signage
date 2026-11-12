@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบควบคุมหน้าจอดิจิทัล (LAN Signage Control)</title>
+  <link rel="stylesheet" href="/admin/style.css">
+</head>
+<body>
+  <!-- macOS Unified Header Toolbar -->
+  <header class="app-header">
+    <div class="header-content">
+      <div class="logo-area">
+        <div class="macos-traffic-lights" aria-label="macOS Controls">
+          <span class="traffic-dot dot-close" title="Close"></span>
+          <span class="traffic-dot dot-minimize" title="Minimize"></span>
+          <span class="traffic-dot dot-fullscreen" title="Zoom"></span>
+        </div>
+        <span class="icon">📺</span>
+        <div>
+          <h1>Smart TV Multi-Channel Signage</h1>
+          <p class="subtitle">ระบบควบคุมหน้าจอทีวี 6 ช่อง &bull; ถ่ายทอดสด &bull; ล็อคภาพ &bull; ตั้งเวลา &bull; รองรับทุกไฟล์</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <!-- 3-Language Selector (macOS Segmented Pill) -->
+        <div class="lang-selector-group" id="lang-selector" role="group" aria-label="Language Selector">
+          <button class="lang-btn active" data-lang="th" title="ภาษาไทย">🇹🇭 TH</button>
+          <button class="lang-btn" data-lang="en" title="English">🇺🇸 EN</button>
+          <button class="lang-btn" data-lang="ja" title="日本語">🇯🇵 JA</button>
+        </div>
+
+        <span id="server-status" class="status-badge connected">● เซิร์ฟเวอร์ทำงานปกติ</span>
+        <button id="master-live-btn" class="btn btn-live">🔴 ถ่ายทอดสดหน้าจอคอม</button>
+        <button id="refresh-all-btn" class="btn btn-secondary">🔄 รีเฟรชข้อมูล</button>
+        <button id="about-btn" class="btn btn-secondary" title="เกี่ยวกับระบบและลิขสิทธิ์">ℹ️ ข้อมูลระบบ</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- macOS Dynamic Island Live Status Bar -->
+  <div id="live-active-bar" class="live-active-bar hidden">
+    <div class="live-active-info">
+      <span class="live-pulsing-circle"></span>
+      <strong id="live-active-text">กำลังถ่ายทอดสดหน้าจอคอมพิวเตอร์ไปยัง: ช่อง 1</strong>
+      <span class="live-stream-badge">LIVE 1080p</span>
+    </div>
+    <button id="stop-live-btn" class="btn btn-danger btn-sm">⏹️ หยุดถ่ายทอดสด</button>
+  </div>
+
+  <!-- macOS Segmented Channel Switcher -->
+  <div class="macos-subbar">
+    <div class="segmented-control" id="channel-segment-bar" role="tablist">
+      <button class="segment-btn active" data-channel="all" role="tab">🎛️ ทุกช่อง (ทั้งหมด)</button>
+      <button class="segment-btn" data-channel="1" role="tab">ช่อง 1</button>
+      <button class="segment-btn" data-channel="2" role="tab">ช่อง 2</button>
+      <button class="segment-btn" data-channel="3" role="tab">ช่อง 3</button>
+      <button class="segment-btn" data-channel="4" role="tab">ช่อง 4</button>
+      <button class="segment-btn" data-channel="5" role="tab">ช่อง 5</button>
+      <button class="segment-btn" data-channel="6" role="tab">ช่อง 6</button>
+    </div>
+    <div class="view-mode-hint">
+      <span>✨ macOS Fluid UI &bull; Real-time LAN Sync</span>
+    </div>
+  </div>
+
+  <main class="app-main">
+    <div class="instructions-card">
+      <div class="instruction-step">
+        <span class="step-num">1</span>
+        <div><strong>ลากไฟล์ลงช่องได้ทันที:</strong> รองรับภาพ JPG/PNG/GIF, วิดีโอ MP4, เอกสาร PDF, Excel/CSV, และข้อความประกาศ TXT</div>
+      </div>
+      <div class="instruction-step">
+        <span class="step-num">2</span>
+        <div><strong>ฟังก์ชันควบคุมสด:</strong> คลิก <strong>"✏️ แก้ไขชื่อช่อง"</strong>, ใส่เวลาช่องเดียวแล้วกด <strong>"ปรับทุกไฟล์"</strong>, กด <strong>"▶ แสดงทันที"</strong> เพื่อบังคับสไลด์, หรือกด <strong>"❄️ ล็อคภาพ"</strong></div>
+      </div>
+      <div class="instruction-step">
+        <span class="step-num">3</span>
+        <div><strong>🔴 ถ่ายทอดสดหน้าจอคอม:</strong> คลิกปุ่มสีแดงด้านบนเพื่อสตรีมหน้าจอคอมหรือหน้าต่างแอป (Excel, PowerPoint, Web) ไปยังทีวีแบบเรียลไทม์</div>
+      </div>
+    </div>
+
+    <!-- Notification Toast (macOS Notification Banner) -->
+    <div id="toast" class="toast hidden"></div>
+
+    <!-- Channels Grid Container -->
+    <section class="channels-grid" id="channels-container">
+      <!-- 6 Channel cards will be rendered dynamically by admin.js -->
+      <div class="loading-spinner">กำลังโหลดข้อมูลช่องสัญญาณ...</div>
+    </section>
+  </main>
+
+  <!-- Live Screen Share Modal (macOS Sheet Dialog) -->
+  <div id="live-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="macos-traffic-lights" aria-hidden="true">
+          <span class="traffic-dot dot-close" id="modal-traffic-close"></span>
+          <span class="traffic-dot dot-minimize"></span>
+          <span class="traffic-dot dot-fullscreen"></span>
+        </div>
+        <h3>🔴 ถ่ายทอดสดหน้าจอคอมพิวเตอร์ (Live Screen Share)</h3>
+        <button class="modal-close" id="live-modal-close">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-instruction">เลือกหน้าจอ, หน้าต่างโปรแกรม (เช่น Excel, PowerPoint) หรือแท็บ เพื่อส่งภาพสดไปยังทีวีแบบเรียลไทม์ผ่าน LAN</p>
+        <div class="form-group">
+          <label for="live-target-select"><strong>ส่งสัญญาณภาพไปยัง:</strong></label>
+          <select id="live-target-select" class="form-select">
+            <option value="all">📺 ทุกช่องพร้อมกัน (ช่อง 1 - 6)</option>
+            <option value="1">ช่อง 1</option>
+            <option value="2">ช่อง 2</option>
+            <option value="3">ช่อง 3</option>
+            <option value="4">ช่อง 4</option>
+            <option value="5">ช่อง 5</option>
+            <option value="6">ช่อง 6</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="live-quality-select"><strong>คุณภาพสัญญาณภาพ:</strong></label>
+          <select id="live-quality-select" class="form-select">
+            <option value="1080p">🌟 1080p Full HD 20 FPS (คมชัดสูงสุด เหมาะสำหรับประชุม/ตัวหนังสือ Excel)</option>
+            <option value="720p">⚡ 720p HD 15 FPS (โหมดมาตรฐาน ประหยัดแบนด์วิดท์)</option>
+          </select>
+        </div>
+        <div class="live-modal-tip">
+          💡 <strong>คำแนะนำ:</strong> เมื่อกดเริ่ม เบราว์เซอร์จะให้เลือกหน้าจอที่ต้องการแชร์ สามารถคลิกเลือกทั้งหน้าจอ (Entire Screen) หรือเลือกเฉพาะหน้าต่างโปรแกรมได้ ภาพจะส่งเข้าทีวีทันทีโดยไม่ต้องลงโปรแกรมเพิ่ม
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="cancel-live-modal-btn" class="btn btn-secondary">ยกเลิก</button>
+        <button id="start-live-confirm-btn" class="btn btn-primary btn-live-start">🚀 เริ่มถ่ายทอดสด</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- macOS About Modal (Developer Ownership & License) -->
+  <div id="about-modal" class="modal-overlay hidden">
+    <div class="modal-card about-modal-card">
+      <div class="modal-header">
+        <div class="macos-traffic-lights" aria-hidden="true">
+          <span class="traffic-dot dot-close" id="about-traffic-close"></span>
+          <span class="traffic-dot dot-minimize"></span>
+          <span class="traffic-dot dot-fullscreen"></span>
+        </div>
+        <h3 id="about-modal-title">เกี่ยวกับ Smart TV Signage</h3>
+        <button class="modal-close" id="about-modal-close">✕</button>
+      </div>
+      <div class="modal-body about-modal-body">
+        <div class="about-app-badge">
+          <div class="about-icon">📺</div>
+          <h2 id="about-app-name">Smart TV Multi-Channel Signage</h2>
+          <span class="about-version-tag" id="about-version">เวอร์ชัน 1.2 (macOS Edition)</span>
+        </div>
+        <p class="about-desc" id="about-desc">
+          ระบบกระจายภาพ สไลด์ และถ่ายทอดสดหน้าจอคอมพิวเตอร์ไปยัง Smart TV 6 ช่อง ผ่านระบบเครือข่ายภายใน (LAN/Wi-Fi) โดยไม่ต้องใช้อินเทอร์เน็ตภายนอก
+        </p>
+        <div class="about-author-card">
+          <div class="about-author-row">
+            <span class="author-label">👤 ผู้พัฒนา &amp; เจ้าของลิขสิทธิ์:</span>
+            <strong class="author-name">mamabuncho</strong>
+          </div>
+          <div class="about-author-row">
+            <span class="author-label">📧 ติดต่อ:</span>
+            <a href="mailto:mamabuncho@gmail.com" class="author-email">mamabuncho@gmail.com</a>
+          </div>
+          <div class="about-author-row">
+            <span class="author-label">🐙 GitHub:</span>
+            <a href="https://github.com/mamabuncho" target="_blank" rel="noopener noreferrer" class="author-github">github.com/mamabuncho</a>
+          </div>
+        </div>
+        <div class="about-legal" id="about-legal">
+          ลิขสิทธิ์ © 2026 mamabuncho. สงวนลิขสิทธิ์ทุกประการ.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="about-modal-done-btn" class="btn btn-primary">ตกลง</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="app-footer">
+    <p id="app-footer-text">Smart TV Multi-Channel LAN Digital Signage System &bull; พัฒนาโดย <strong>mamabuncho</strong> &bull; สงวนลิขสิทธิ์ &copy; 2026</p>
+  </footer>
+
+  <script type="module" src="/admin/admin.js"></script>
+</body>
+</html>
