@@ -328,33 +328,34 @@ function renderAllChannels() {
 
     card.innerHTML = `
       <div class="channel-header">
-        <div class="channel-title-row">
-          <h2>${t('channelLabel')} ${ch.id}:</h2>
-          <input type="text" id="channel-name-input-${ch.id}" class="channel-name-input"
-            value="${escapeHtml(ch.name || `Channel ${ch.id}`)}"
-            placeholder="${t('renamePlaceholder')}"
-            title="${t('renameHint')}"
-            onblur="saveChannelName(${ch.id})"
-            onkeydown="if(event.key==='Enter') this.blur();">
-          <button class="btn-rename-icon" onclick="document.getElementById('channel-name-input-${ch.id}').focus()" title="${t('renameIconTitle')}">✏️</button>
-        </div>
-        <div class="channel-header-controls">
-          <button class="btn btn-xs ${isFrozen ? 'btn-frozen' : 'btn-freeze'}" id="freeze-btn-${ch.id}" onclick="toggleFreeze(${ch.id})">
-            ${isFrozen ? t('frozenBtn') : t('freezeBtn')}
-          </button>
-          <button class="btn btn-xs btn-outline-live" onclick="openLiveModalForChannel(${ch.id})" title="${t('streamLiveTitle')}">
-            ${t('streamLiveBtn')}
-          </button>
+        <div class="channel-header-row1">
+          <div class="channel-title-row">
+            <h2>${t('channelLabel')} ${ch.id}:</h2>
+            <input type="text" id="channel-name-input-${ch.id}" class="channel-name-input"
+              value="${escapeHtml(ch.name || `Channel ${ch.id}`)}"
+              placeholder="${t('renamePlaceholder')}"
+              title="${t('renameHint')}"
+              onblur="saveChannelName(${ch.id})"
+              onkeydown="if(event.key==='Enter') this.blur();">
+            <button class="btn-rename-icon" onclick="document.getElementById('channel-name-input-${ch.id}').focus()" title="${t('renameIconTitle')}">✏️</button>
+          </div>
           <div class="channel-links">
             <a href="/tv/${ch.id}" target="_blank" title="${t('openTvTitle')}">${t('openTvLink')}</a>
           </div>
         </div>
-      </div>
-
-      <div style="margin-bottom: 0.75rem;">
-        <span id="status-badge-${ch.id}" class="status-badge ${isOnline ? 'connected' : 'offline'}">
-          ${isOnline ? `${t('tvOnline')} (${ch.client_count || 1} ${t('screensUnit')})` : t('tvOffline')}
-        </span>
+        <div class="channel-header-row2">
+          <span id="status-badge-${ch.id}" class="status-badge ${isOnline ? 'connected' : 'offline'}">
+            ${isOnline ? `${t('tvOnline')} (${ch.client_count || 1} ${t('screensUnit')})` : t('tvOffline')}
+          </span>
+          <div class="channel-header-controls">
+            <button class="btn btn-xs ${isFrozen ? 'btn-frozen' : 'btn-freeze'}" id="freeze-btn-${ch.id}" onclick="toggleFreeze(${ch.id})">
+              ${isFrozen ? t('frozenBtn') : t('freezeBtn')}
+            </button>
+            <button class="btn btn-xs btn-outline-live" onclick="openLiveModalForChannel(${ch.id})" title="${t('streamLiveTitle')}">
+              ${t('streamLiveBtn')}
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- Drag & Drop Zone -->

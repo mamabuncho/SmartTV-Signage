@@ -2,7 +2,7 @@
 
 [![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)](https://github.com/mamabuncho/SmartTV-Signage)
 [![Node](https://img.shields.io/badge/node-%3E%3D20.0.0-green.svg)](https://nodejs.org/)
-[![UI](https://img.shields.io/badge/UI-macOS%20Fluid%20Glass-purple.svg)](https://github.com/mamabuncho/SmartTV-Signage)
+[![UI](https://img.shields.io/badge/UI-Modern%20Clean%20Light-blue.svg)](https://github.com/mamabuncho/SmartTV-Signage)
 [![Languages](https://img.shields.io/badge/languages-TH%20|%20EN%20|%20JA-orange.svg)](https://github.com/mamabuncho/SmartTV-Signage)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Author](https://img.shields.io/badge/author-mamabuncho-cyan.svg)](https://github.com/mamabuncho)
@@ -39,8 +39,8 @@
    * ปุ่มหยุดการเปลี่ยนภาพค้างไว้สำหรับประชุมหรือนำเสนอเนื้อหาสำคัญ
 6. **✏️ ตั้งชื่อช่องสัญญาณได้อิสระ (Channel Renaming):**
    * เปลี่ยนชื่อช่องได้ตามใจชอบ เช่น "ห้องประชุม A", "หน้าเคาน์เตอร์", "ฝ่ายผลิต"
-7. **🎨 ดีไซน์ระดับพรีเมียม (macOS Sonoma / Sequoia Fluid Glass):**
-   * หน้าจอแอดมินสไตล์ macOS Dark Mode พร้อมแถบควบคุม Segmented Switcher, หน้าต่าง Sheet, แถบแจ้งเตือน Notification Banner และรองรับ 3 ภาษา (ไทย, อังกฤษ, ญี่ปุ่น)
+7. **🎨 ดีไซน์ทันสมัย สบายตา เป็นมิตรต่อผู้ใช้งาน (Modern Clean Light UI):**
+   * หน้าจอแอดมินธีมสว่าง (Light Theme) สไตล์โมเดิร์น สบายตา จัดวางอย่างเป็นระเบียบ พร้อมแถบสลับช่องแบบ Segmented Control, หน้าต่าง Modal ควบคุมการถ่ายทอดสด, แจ้งเตือนสถานะแบบเรียลไทม์ และรองรับ 3 ภาษา (ไทย, อังกฤษ, ญี่ปุ่น)
 8. **ไม่ต้องติดตั้งโปรแกรมบนทีวี:**
    * เปิดผ่านเบราว์เซอร์ของ Smart TV ได้โดยตรง ไม่ต้อง Root หรือลงไฟล์ APK เพิ่มเติม
 
